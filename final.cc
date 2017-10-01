@@ -24,7 +24,6 @@ int getNumberOfConnections(){
     char buf[MAX_PATH];
     FILE *fp;
     fp = popen("netstat -ntu | grep 1.7:21", "r");//ip end with port
-    //fp = popen("ls -l | grep .txt", "r");
     if(fp == NULL){
         return -1;
     }
@@ -47,10 +46,8 @@ void readyUpDisk(){
 
 void disableDisk(){
     system("umount /mnt/hdd/a");
-    cout<<"umount"<<endl;
     this_thread::sleep_for( chrono::seconds(2) );
     system("hdparm -y /dev/sda");
-    cout<<"hdparm"<<endl;
     this_thread::sleep_for( chrono::seconds(5) );
     digitalWrite(GPIO_HDD_PIN, LOW);
 }
@@ -68,20 +65,15 @@ int main(){
         lines = getNumberOfConnections();
         if(lines>0){
             if(isDiskEnabled == false){
-                //cout<<"Enabling HDD\n";
                 readyUpDisk();
                 isDiskEnabled = true;
             }
-            //cout<<"Got "<<lines<<" connection(s), sleeping\n";
             this_thread::sleep_for( connectedInterval );
         }else{
             if(isDiskEnabled == true){
-                //stop hdd
-                //cout<<"HDD stop\n";
                 disableDisk();
                 isDiskEnabled = false;
             }
-            //cout<<"No connections, awaiting\n";
             this_thread::sleep_for( checkInterval );
         }
     }   
